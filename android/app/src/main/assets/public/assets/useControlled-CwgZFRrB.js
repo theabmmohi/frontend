@@ -1,0 +1,1 @@
+import{i as e}from"./jsx-runtime-BE_tW6Ee.js";import{t}from"./react-BL2tfwYF.js";var n=e(t(),1);function r(e){let{controlled:t,default:r,name:i,state:a=`value`}=e,{current:o}=n.useRef(t!==void 0),[s,c]=n.useState(r);return[o?t:s,n.useCallback(e=>{o||c(e)},[])]}var i=r;export{r as n,i as t};

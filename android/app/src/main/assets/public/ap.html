@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ImABM — Add Product</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    header {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    header span { font-size: 0.8rem; color: #888; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .card.full { grid-column: 1 / -1; }
+
+    h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #555;
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    label:first-of-type { margin-top: 0; }
+    label span { color: #ef4444; }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1.5px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fafafa;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #6366f1;
+      background: #fff;
+    }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .type-toggle {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .type-btn {
+      flex: 1;
+      padding: 9px;
+      border: 1.5px solid #e5e5e5;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .type-btn.active {
+      border-color: #6366f1;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    /* Image upload */
+    .img-area {
+      border: 2px dashed #e5e5e5;
+      border-radius: 10px;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      overflow: hidden;
+      position: relative;
+      background: #fafafa;
+    }
+    .img-area:hover { border-color: #6366f1; }
+    .img-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0; left: 0;
+      display: none;
+    }
+    .img-area img.show { display: block; }
+    .img-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: #bbb;
+      font-size: 0.8rem;
+    }
+    .img-placeholder svg { width: 36px; height: 36px; }
+    .img-area.has-img .img-placeholder { display: none; }
+
+    /* Submit */
+    #btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+    #btn-submit:hover   { background: #4f46e5; }
+    #btn-submit:active  { transform: scale(0.98); }
+    #btn-submit:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e1e1e;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { background: #16a34a; }
+    #toast.error   { background: #dc2626; }
+
+    /* Recent */
+    .product-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .product-item:last-child { border-bottom: none; }
+    .product-item img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f0f0f0;
+    }
+    .product-item .info { flex: 1; min-width: 0; }
+    .product-item .info .pname {
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .product-item .info .pmeta { font-size: 0.75rem; color: #888; }
+    .product-item .price { font-size: 0.9rem; font-weight: 700; color: #6366f1; white-space: nowrap; }
+    .empty { color: #ccc; font-size: 0.85rem; text-align: center; padding: 20px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge.digital  { background: #ede9fe; color: #7c3aed; }
+    .badge.physical { background: #dcfce7; color: #16a34a; }
+  </style>
+</head>
+<body>
+
+<div style="max-width:900px; margin: 0 auto;">
+  <header>
+    <h1>ImABM — Product Dashboard</h1>
+    <span id="count-label">Loading...</span>
+  </header>
+
+  <div class="grid">
+
+    <!-- Image -->
+    <div class="card">
+      <h2>Product Image</h2>
+      <div class="img-area" id="img-area" onclick="document.getElementById('image').click()">
+        <img id="img-preview"/>
+        <div class="img-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Click to upload image
+        </div>
+      </div>
+      <input id="image" type="file" accept="image/*" style="display:none"/>
+    </div>
+
+    <!-- Details -->
+    <div class="card">
+      <h2>Product Details</h2>
+
+      <label>Name <span>*</span></label>
+      <input id="name" type="text" placeholder="e.g. Blue T-Shirt"/>
+
+      <label>Price (৳) <span>*</span></label>
+      <input id="price" type="number" min="0" step="0.01" placeholder="0.00"/>
+
+      <label>Type <span>*</span></label>
+      <div class="type-toggle">
+        <button class="type-btn active" data-type="physical" onclick="selectType('physical')">📦 Physical</button>
+        <button class="type-btn"        data-type="digital"  onclick="selectType('digital')">💾 Digital</button>
+      </div>
+
+      <label>Category</label>
+      <input id="category" type="text" placeholder="e.g. Food, Clothing"/>
+
+      <label>Description</label>
+      <textarea id="description" placeholder="Product description..."></textarea>
+
+      <br/>
+      <button id="btn-submit" onclick="submitProduct()">Add Product</button>
+    </div>
+
+    <!-- Recent -->
+    <div class="card full">
+      <h2>Recently Added</h2>
+      <div id="recent-list"><div class="empty">No products added yet</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const SERVER = "https://api.imabm.eu.cc"
+  let selectedType = "physical"
+  let recentItems  = []
+
+  // type toggle
+  function selectType(type) {
+    selectedType = type
+    document.querySelectorAll(".type-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.type === type)
+    })
+  }
+
+  // image preview
+  document.getElementById("image").onchange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const preview = document.getElementById("img-preview")
+    const area    = document.getElementById("img-area")
+    preview.src = URL.createObjectURL(file)
+    preview.classList.add("show")
+    area.classList.add("has-img")
+  }
+
+  // toast
+  function toast(msg, type = "success") {
+    const el = document.getElementById("toast")
+    el.textContent = msg
+    el.className   = `show ${type}`
+    setTimeout(() => el.className = "", 3000)
+  }
+
+  // render recent
+  function renderRecent() {
+    const el = document.getElementById("recent-list")
+    if (!recentItems.length) {
+      el.innerHTML = `<div class="empty">No products added yet</div>`
+      return
+    }
+    el.innerHTML = recentItems.slice(0, 10).map(p => `
+      <div class="product-item">
+        <img src="${p.imageUrl || ""}" onerror="this.style.display='none'"/>
+        <div class="info">
+          <div class="pname">${p.name}</div>
+          <div class="pmeta">
+            <span class="badge ${p.type}">${p.type}</span>
+            ${p.category ? `· ${p.category}` : ""}
+            · ID: ${p.id}
+          </div>
+        </div>
+        <div class="price">৳${p.price}</div>
+      </div>
+    `).join("")
+  }
+
+  // submit
+  async function submitProduct() {
+    const name        = document.getElementById("name").value.trim()
+    const price       = document.getElementById("price").value
+    const category    = document.getElementById("category").value.trim()
+    const description = document.getElementById("description").value.trim()
+    const imageFile   = document.getElementById("image").files[0]
+    const btn         = document.getElementById("btn-submit")
+
+    if (!name)  return toast("Name is required", "error")
+    if (!price) return toast("Price is required", "error")
+
+    btn.disabled    = true
+    btn.textContent = "Adding..."
+
+    try {
+      const form = new FormData()
+      form.append("name",        name)
+      form.append("price",       price)
+      form.append("type",        selectedType)
+      form.append("category",    category || "Uncategorized")
+      form.append("description", description)
+      if (imageFile) form.append("image", imageFile)
+
+      const res  = await fetch(`${SERVER}/product/add`, { method: "POST", body: form })
+      const data = await res.json()
+
+      if (data.success) {
+        toast(`✅ Added! ID: ${data.productId}`)
+        recentItems.unshift(data.product)
+        renderRecent()
+        updateCount()
+
+        // reset
+        document.getElementById("name").value        = ""
+        document.getElementById("price").value       = ""
+        document.getElementById("category").value    = ""
+        document.getElementById("description").value = ""
+        document.getElementById("image").value       = ""
+        document.getElementById("img-preview").classList.remove("show")
+        document.getElementById("img-area").classList.remove("has-img")
+      } else {
+        toast(`❌ ${data.message}`, "error")
+      }
+    } catch(e) {
+      toast(`❌ ${e.message}`, "error")
+    } finally {
+      btn.disabled    = false
+      btn.textContent = "Add Product"
+    }
+  }
+
+  function updateCount() {
+    document.getElementById("count-label").textContent =
+      `${recentItems.length} product${recentItems.length !== 1 ? "s" : ""} added this session`
+  }
+
+  updateCount()
+</script>
+</body>
+</html>
