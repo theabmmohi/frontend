@@ -21,8 +21,9 @@ import {
   Box
 } from "@mui/material"
 import { startAuthentication } from "@simplewebauthn/browser"
-import { useAuth, auth } from "@/firebase"
 import { useNavigate }   from "react-router-dom"
+import { Capacitor } from "@capacitor/core"
+import { useAuth, auth } from "@/firebase"
 import api from "@/api"
 
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
@@ -116,13 +117,14 @@ export default function SignIn() {
         <TextField fullWidth size="small" label="Password" type={showPass?"text":"password"} value={password} onChange={e => setPassword(e.target.value)} slotProps={{ input: { endAdornment: (<IconButton size="small" onClick={() => setShowPass(!showPass)}>{showPass?<VisibilityIcon/>:<VisibilityOffIcon/>}</IconButton>) } }}/>
         <Button sx={{ width: "75%" }} type="submit" variant="contained">Sign In</Button>
         
-        <Divider sx={{ width: "100%"}}>Or Continue With</Divider>
-        
-        <Stack spacing={1.25} sx={{ width: "75%" }}>
-          {isPasskeySupported && (<Button variant="outlined" startIcon={<KeyIcon/>} onClick={handlePasskey} sx={{ color: "black" }}>Passkey</Button>)}
-          <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "black" }}>Google</Button>
-          <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "black" }}>Github</Button>
-        </Stack>
+        {!Capacitor.isNativePlatform() && (<>
+          <Divider sx={{ width: "100%"}}>Or Continue With</Divider>
+          <Stack spacing={1.25} sx={{ width: "75%" }}>
+            {isPasskeySupported && (<Button variant="outlined" startIcon={<KeyIcon/>} onClick={handlePasskey} sx={{ color: "black" }}>Passkey</Button>)}
+            <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "black" }}>Google</Button>
+            <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "black" }}>Github</Button>
+          </Stack>
+        </>)}
         
         <Snackbar
           open={open}
