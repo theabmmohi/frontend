@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ImABM</string>
+    <string name="title_activity_main">ImABM</string>
+    <string name="package_name">com.imabm.app</string>
+    <string name="custom_url_scheme">com.imabm.app</string>
+</resources>
