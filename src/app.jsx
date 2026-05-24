@@ -1,5 +1,6 @@
 import {
   useTransition,
+  useEffect,
   Suspense,
   lazy
 } from "react"
@@ -36,6 +37,7 @@ import {
 } from "@mui/material"
 import { useAuth } from "@/firebase"
 import { useCart } from "@/useCart"
+import { App as CapApp } from "@capacitor/app"
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
@@ -65,6 +67,18 @@ export default function App() {
   const user = useAuth()
   
   const hideNav = ["/admin", "/signin", "/signup", "/view"].some(path => nav.startsWith(path))
+  
+  useEffect(() => {
+    let handler
+    CapApp.addListener("backButton", () => {
+      if (location.pathname === "/") {
+        CapApp.exitApp()
+      } else {
+        navigate(-1)
+      }
+    }).then(h => { handler = h })
+    return () => handler?.remove()
+  }, [location.pathname])
   
   return (
     <Box sx={{
