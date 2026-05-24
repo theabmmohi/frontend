@@ -4,6 +4,7 @@ import {
 } from "react"
 import {
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithCustomToken,
   GithubAuthProvider,
   GoogleAuthProvider,
@@ -58,8 +59,8 @@ export default function SignIn() {
   }, [user, navigate])
   
   const handleEmail = async (e) => {
-    e.preventDefault();
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    e.preventDefault()
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     if (!email || !password) {
       setError("Email And Password Are Required")
       setOpen(true)
@@ -109,7 +110,19 @@ export default function SignIn() {
     }
   }
   const handleForgot = async () => {
-    
+    if (!email) {
+      setError("Please enter your email address first.")
+      setOpen(true)
+      return
+    }
+    try {
+      await sendPasswordResetEmail(auth, email)
+      setError("Password reset email sent!")
+      setOpen(true)
+    } catch (e) {
+      setError(e.message)
+      setOpen(true)
+    }
   }
   
   return (

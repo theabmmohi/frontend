@@ -102,7 +102,7 @@ export default function SignUp() {
   }
   
   return (
-    <Box sx={{ maxWidth: 400, mx: "auto", p: 5 }}>
+    <Box sx={{ maxWidth: 500, mx: "auto", p: 5 }}>
       <Typography variant="h5" sx={{ textAlign: "center", my: 2.5 }}>Sign Up</Typography>
       <Stack component="form" onSubmit={handleSubmit} spacing={2.5} sx={{ alignItems: "center" }}>
         <TextField fullWidth size="small" label="Name" value={name} onChange={e => setName(e.target.value)}/>
