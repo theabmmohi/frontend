@@ -8,6 +8,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
+    chunkSizeWarningLimit: 750,
     rollupOptions: {
       input: "index.html"
     }

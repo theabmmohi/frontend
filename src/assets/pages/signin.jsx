@@ -5,8 +5,8 @@ import {
 import {
   signInWithEmailAndPassword,
   signInWithCustomToken,
-  GoogleAuthProvider,
   GithubAuthProvider,
+  GoogleAuthProvider,
   signInWithPopup
 } from "firebase/auth"
 import {
@@ -108,13 +108,20 @@ export default function SignIn() {
       setOpen(true)
     }
   }
+  const handleForgot = async () => {
+    
+  }
   
   return (
-    <Box sx={{ maxWidth: 400, mx: "auto", p: 5 }}>
+    <Box sx={{ maxWidth: 500, mx: "auto", p: 5 }}>
       <Typography variant="h5" sx={{ textAlign: "center", my: 2.5 }}>Sign In</Typography>
       <Stack component="form" onSubmit={handleEmail} spacing={2.5} sx={{ alignItems: "center" }}>
         <TextField fullWidth size="small" label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)}/>
         <TextField fullWidth size="small" label="Password" type={showPass?"text":"password"} value={password} onChange={e => setPassword(e.target.value)} slotProps={{ input: { endAdornment: (<IconButton size="small" onClick={() => setShowPass(!showPass)}>{showPass?<VisibilityIcon/>:<VisibilityOffIcon/>}</IconButton>) } }}/>
+        <Stack direction="row" sx={{ width: "100%", justifyContent: "space-between" }}>
+          <Button onClick={handleForgot}>Forgot Password</Button>
+          <Button onClick={() => navigate("/signup")}>Sign Up</Button>
+        </Stack>
         <Button sx={{ width: "75%" }} type="submit" variant="contained">Sign In</Button>
         
         {!Capacitor.isNativePlatform() && (<>

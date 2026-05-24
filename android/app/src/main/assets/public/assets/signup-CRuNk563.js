@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-BE_tW6Ee.js";var t=e();function n(){return(0,t.jsx)(t.Fragment,{children:`SignUp`})}export{n as default};
