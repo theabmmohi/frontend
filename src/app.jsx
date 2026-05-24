@@ -1,5 +1,6 @@
 import {
   useTransition,
+  useContext,
   useEffect,
   Suspense,
   lazy
@@ -35,13 +36,16 @@ import {
   Menu,
   Box
 } from "@mui/material"
+import { App as CapApp } from "@capacitor/app"
 import { useAuth } from "@/firebase"
 import { useCart } from "@/useCart"
-import { App as CapApp } from "@capacitor/app"
+import { ThemeCtx } from "@/main"
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import StorefrontIcon from "@mui/icons-material/Storefront"
+import LightModeIcon from "@mui/icons-material/LightMode"
+import DarkModeIcon from "@mui/icons-material/DarkMode"
 import SettingsIcon from "@mui/icons-material/Settings"
 import LogoutIcon from "@mui/icons-material/Logout"
 import LoginIcon from "@mui/icons-material/Login"
@@ -62,6 +66,7 @@ export default function App() {
   const location = useLocation()
   
   const [isPending, startTransition] = useTransition()
+  const { dark, toggle } = useContext(ThemeCtx)
   const { count } = useCart()
   const nav = location.pathname
   const user = useAuth()
@@ -113,6 +118,10 @@ export default function App() {
                     Sign Out
                   </MenuItem>
                 )}
+                <MenuItem onClick={() => {toggle(); popupState.close()}}>
+                  <ListItemIcon>{dark?<LightModeIcon/>:<DarkModeIcon/>}</ListItemIcon>
+                  {dark?"Light Mode":"Dark Mode"}
+                </MenuItem>
                 
                 {/* Will Delete This Item Later */}
                 <MenuItem onClick={() => { navigate("/tp.html"); window.location.reload(); popupState.close() }}>
