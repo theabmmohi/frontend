@@ -117,8 +117,8 @@ export default function SignUp() {
         {!Capacitor.isNativePlatform() && (<>
           <Divider sx={{ width: "100%"}}>Or Continue With</Divider>
           <Stack spacing={1.25} sx={{ width: "75%" }}>
-            <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "black" }}>Google</Button>
-            <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "black" }}>Github</Button>
+            <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "text.primary" }}>Google</Button>
+            <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "text.primary" }}>Github</Button>
           </Stack>
         </>)}
         

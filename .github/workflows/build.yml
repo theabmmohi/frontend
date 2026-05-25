@@ -12,6 +12,27 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Bump version
+        id: version
+        run: |
+          FILE=android/app/build.gradle
+
+          OLD=$(grep versionName $FILE | grep -o '".*"' | tr -d '"')
+          IFS='.' read -r major minor patch <<< "$OLD"
+          patch=$((patch + 1))
+          if [ $patch -gt 9 ]; then patch=0; minor=$((minor + 1)); fi
+          if [ $minor -gt 9 ]; then minor=0; major=$((major + 1)); fi
+          NEW="$major.$minor.$patch"
+
+          sed -i "s/versionName \"$OLD\"/versionName \"$NEW\"/" $FILE
+          OLD_CODE=$(grep versionCode $FILE | grep -o '[0-9]*')
+          sed -i "s/versionCode $OLD_CODE/versionCode $((OLD_CODE + 1))/" $FILE
+
+          echo "version=$NEW" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,8 +57,27 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Rename and copy APK
+        id: apk
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          SLUG=$(echo "$COMMIT_MSG" | tr ' ' '-' | tr -cd '[:alnum:]-')
+          VERSION=${{ steps.version.outputs.version }}
+          APK_NAME="${VERSION}U-${SLUG}.apk"
+          mkdir -p releases
+          cp android/app/build/outputs/apk/debug/app-debug.apk "releases/${APK_NAME}"
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump and APK
+        run: |
+          git config user.email "ci@github.com"
+          git config user.name "GitHub Actions"
+          git add android/app/build.gradle releases/
+          git commit -m "v${{ steps.version.outputs.version }}"
+          git push
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: ${{ steps.apk.outputs.apk_name }}
+          path: releases/${{ steps.apk.outputs.apk_name }}

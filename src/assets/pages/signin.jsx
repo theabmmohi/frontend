@@ -140,9 +140,9 @@ export default function SignIn() {
         {!Capacitor.isNativePlatform() && (<>
           <Divider sx={{ width: "100%"}}>Or Continue With</Divider>
           <Stack spacing={1.25} sx={{ width: "75%" }}>
-            {isPasskeySupported && (<Button variant="outlined" startIcon={<KeyIcon/>} onClick={handlePasskey} sx={{ color: "black" }}>Passkey</Button>)}
-            <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "black" }}>Google</Button>
-            <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "black" }}>Github</Button>
+            {isPasskeySupported && (<Button variant="outlined" startIcon={<KeyIcon/>} onClick={handlePasskey} sx={{ color: "text.primary" }}>Passkey</Button>)}
+            <Button variant="outlined" startIcon={<GoogleIcon/>} onClick={handleGoogle} sx={{ color: "text.primary" }}>Google</Button>
+            <Button variant="outlined" startIcon={<GitHubIcon/>} onClick={handleGithub} sx={{ color: "text.primary" }}>Github</Button>
           </Stack>
         </>)}
         

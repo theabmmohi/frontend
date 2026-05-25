@@ -73,18 +73,6 @@ export default function App() {
   
   const hideNav = ["/admin", "/signin", "/signup", "/view"].some(path => nav.startsWith(path))
   
-  useEffect(() => {
-    let handler
-    CapApp.addListener("backButton", () => {
-      if (location.pathname === "/") {
-        CapApp.exitApp()
-      } else {
-        navigate(-1)
-      }
-    }).then(h => { handler = h })
-    return () => handler?.remove()
-  }, [location.pathname])
-  
   return (
     <Box sx={{
       flexDirection: "column",
@@ -118,7 +106,7 @@ export default function App() {
                     Sign Out
                   </MenuItem>
                 )}
-                <MenuItem onClick={() => {toggle(); popupState.close()}}>
+                <MenuItem onClick={() => {popupState.close(), toggle()}}>
                   <ListItemIcon>{dark?<LightModeIcon/>:<DarkModeIcon/>}</ListItemIcon>
                   {dark?"Light Mode":"Dark Mode"}
                 </MenuItem>
@@ -139,8 +127,8 @@ export default function App() {
       <Box sx={{ position: "relative", overflowY: "auto", flex: 1 }}>
         <Suspense fallback={<Backdrop open sx={{position: "absolute"}}><CircularProgress/></Backdrop>}>
           <Routes>
-            <Route path="/cart" element={<Cart/>}/>
             <Route path="/" element={<Shop/>}/>
+            <Route path="/cart" element={<Cart/>}/>
             <Route path="/me" element={<Me/>}/>
             <Route path="/admin" element={<Admin/>}/>
             <Route path="/signin" element={<SignIn/>}/>
