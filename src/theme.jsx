@@ -11,17 +11,21 @@ function buildTheme(mode) {
       },
       ...(mode === "light" ? {
         text: {
-          primary: "#091016",
-          secondary: "#5e6c84"
+          primary: "#000000",
+          secondary: "#111111"
+        },
+        background: {
+          default: "#eeeeee",
+          paper: "#ffffff"
         }
       } : {
         text: {
-          primary: "#e8f0f7",
-          secondary: "#8899aa"
+          primary: "#ffffff",
+          secondary: "#eeeeee"
         },
         background: {
-          default: "#0d1117",
-          paper: "#161b22"
+          default: "#111111",
+          paper: "#000000"
         }
       })
     },

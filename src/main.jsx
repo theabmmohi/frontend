@@ -6,7 +6,9 @@ import { lightTheme, darkTheme } from "@/theme"
 import { AuthProvider }  from "@/firebase"
 import App from "@/app"
 import "@/main.css"
+
 export const ThemeCtx = createContext()
+
 function Root() {
   const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark")
   const toggle = () => setDark(d => {

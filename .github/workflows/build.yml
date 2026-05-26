@@ -68,6 +68,12 @@ jobs:
           cp android/app/build/outputs/apk/debug/app-debug.apk "releases/${APK_NAME}"
           echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
 
+      - name: Cleanup old releases
+        run: |
+          cd releases
+          ls -t *.apk 2>/dev/null | tail -n +26 | xargs -r rm -f
+          cd ..
+
       - name: Commit version bump and APK
         run: |
           git config user.email "ci@github.com"

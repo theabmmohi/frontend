@@ -1,1 +1,0 @@
-import{i as e,t}from"./jsx-runtime-BE_tW6Ee.js";import{t as n}from"./react-BL2tfwYF.js";var r=e(n(),1),i=t(),a=r.createContext();function o({value:e,...t}){return(0,i.jsx)(a.Provider,{value:e??!0,...t})}var s=()=>r.useContext(a)??!1;export{s as n,o as t};

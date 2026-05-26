@@ -19,8 +19,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(new URL("./src", import.meta.url).pathname),
-      "@page": path.resolve(new URL("./src/assets/pages", import.meta.url).pathname),
-      "@error": path.resolve(new URL("./src/assets/pages/errors", import.meta.url).pathname)
+      "@page": path.resolve(new URL("./src/assets/pages", import.meta.url).pathname)
     }
   }
 })

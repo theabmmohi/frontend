@@ -59,7 +59,6 @@ const Admin  = lazy(() => Promise.all([import("@page/admin"), delay(ms)]).then((
 const SignIn = lazy(() => Promise.all([import("@page/signin"), delay(ms)]).then(([m]) => m))
 const SignUp = lazy(() => Promise.all([import("@page/signup"), delay(ms)]).then(([m]) => m))
 const View   = lazy(() => Promise.all([import("@page/view"), delay(ms)]).then(([m]) => m))
-const E404   = lazy(() => Promise.all([import("@error/E404"), delay(ms)]).then(([m]) => m))
 
 export default function App() {
   const navigate = useNavigate()
@@ -134,7 +133,7 @@ export default function App() {
             <Route path="/signin" element={<SignIn/>}/>
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/view/:pid" element={<View/>}/>
-            <Route path="*" element={<E404/>}/>
+            <Route path="*" element={<Shop/>}/>
           </Routes>
         </Suspense>
         <Backdrop open={isPending} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, position: "absolute" }}><CircularProgress/></Backdrop>
