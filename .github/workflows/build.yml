@@ -86,7 +86,9 @@ jobs:
         run: |
           git config user.email "ci@github.com"
           git config user.name "GitHub Actions"
+          git stash
           git pull --rebase
+          git stash pop 2>/dev/null || true
           git add android/app/build.gradle
           git commit -m "v${{ steps.version.outputs.version }}"
           git push
