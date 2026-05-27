@@ -57,33 +57,36 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Rename and copy APK
+      - name: Rename APK
         id: apk
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%s)
           SLUG=$(echo "$COMMIT_MSG" | tr ' ' '-' | tr -cd '[:alnum:]-')
           VERSION=${{ steps.version.outputs.version }}
           APK_NAME="${VERSION}U-${SLUG}.apk"
-          mkdir -p releases
-          cp android/app/build/outputs/apk/debug/app-debug.apk "releases/${APK_NAME}"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "${APK_NAME}"
           echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
 
-      - name: Cleanup old releases
+      - name: Delete previous release
         run: |
-          cd releases
-          ls -t *.apk 2>/dev/null | tail -n +26 | xargs -r rm -f
-          cd ..
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit version bump and APK
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          body: "v${{ steps.version.outputs.version }} — ${{ steps.apk.outputs.apk_name }}"
+          files: ${{ steps.apk.outputs.apk_name }}
+          make_latest: true
+
+      - name: Commit version bump
         run: |
           git config user.email "ci@github.com"
           git config user.name "GitHub Actions"
-          git add android/app/build.gradle releases/
+          git pull --rebase
+          git add android/app/build.gradle
           git commit -m "v${{ steps.version.outputs.version }}"
           git push
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.apk.outputs.apk_name }}
-          path: releases/${{ steps.apk.outputs.apk_name }}
