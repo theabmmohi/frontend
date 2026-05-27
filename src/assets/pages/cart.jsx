@@ -84,7 +84,7 @@ function SwipeableCartItem({ pid, qty, product, loading, onRemove, onNavigate, o
   const isActive = Math.abs(offset) > 4
   
   return (
-    <Box sx={{ borderRadius: 1, overflow: "hidden", maxHeight: removing ? 0 : 96, opacity: removing ? 0 : 1, transition: removing ? "max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease" : "none" }}>
+    <Box sx={{ borderRadius: 1, overflow: "hidden", maxHeight: removing ? 0 : 96, opacity: removing ? 0 : 1, transition: removing ? "max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease" : "none", boxShadow: 2.5 }}>
       <Box sx={{ position: "relative" }}>
         <Box sx={{ position: "absolute", inset: 0, background: `linear-gradient(to right, #e53935 ${progress * 100}%, transparent 100%)`, display: "flex", alignItems: "center", justifyContent: "flex-start", pl: 2, opacity: isActive && offset > 0 ? 1 : 0, pointerEvents: "none" }}>
           <RemoveShoppingCartIcon sx={{ color: "white", fontSize: 26, transform: `scale(${0.5 + progress * 0.5}) translateX(${(1 - progress) * -12}px)`, transition: dragging.current ? "none" : "transform 0.25s ease", opacity: progress }}/>
@@ -95,27 +95,26 @@ function SwipeableCartItem({ pid, qty, product, loading, onRemove, onNavigate, o
         <Box onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} sx={{ borderRadius: 1, overflow: "hidden", display: "flex", alignItems: "center", height: 96, bgcolor: "background.paper", transform: `translateX(${offset}px)`, transition: dragging.current ? "none" : "transform 0.35s cubic-bezier(0.22,1,0.36,1)", willChange: "transform", userSelect: "none", touchAction: "pan-y" }}>
           <Box component="img" src={product?.imageUrl} onClick={() => onNavigate(pid)} sx={{ width: 96, height: 96, objectFit: "cover", flexShrink: 0, cursor: "pointer", display: "block" }}/>
           <Box sx={{ flex: 1, px: 1.5, minWidth: 0 }}>
-            {loading && !product ? (<CircularProgress size={18}/>) : (<>
-              <Typography noWrap fontWeight={600} sx={{ cursor: "pointer", lineHeight: 1.3 }} onClick={() => onNavigate(pid)}>{product?.name || pid}</Typography>
-              <Typography variant="caption" color="text.secondary" display="block">{product?.category}</Typography>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" mt={0.75}>
-                <Box>
-                  <Typography variant="body2" fontWeight={700} color="primary" lineHeight={1}>BDT {((product?.price || 0) * qty).toLocaleString()}</Typography>
-                  {qty > 1 && (<Typography variant="caption" color="text.disabled">BDT {product?.price} each</Typography>)}
-                </Box>
-                <ButtonGroup size="small" variant="outlined" sx={{ borderRadius: 0, "& .MuiButtonGroup-grouped": { borderRadius: 0 }, "& .MuiButton-root.Mui-disabled": { borderColor: "primary.main", color: "primary.main" } }}>
-                  <Button onClick={() => onSetQty(pid, qty + 1)} sx={{ px: 0.75, minWidth: 30 }}>
-                    <AddIcon sx={{ fontSize: 14 }}/>
-                  </Button>
-                  <Button disabled sx={{ px: 1, minWidth: 32, fontWeight: 700, lineHeight: 1 }}>
-                    {qty}
-                  </Button>
-                  <Button onClick={() => onSetQty(pid, qty - 1)} sx={{ px: 0.75, minWidth: 30 }}>
-                    { qty > 1 ? <RemoveIcon sx={{ fontSize: 14 }}/> : <RemoveShoppingCartIcon sx={{ fontSize: 14 }}/> }
-                  </Button>
-                </ButtonGroup>
+            {loading && !product ? (<CircularProgress size={18}/>) : (
+            <Stack direction="row">
+              <Stack sx={{ flex: 1, minWidth: 0, "& .MuiTypography-root": { textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", display: "block" } }}>
+                <Typography noWrap fontWeight={600} sx={{ cursor: "pointer", lineHeight: 1.3 }} onClick={() => onNavigate(pid)}>{product?.name || pid}</Typography>
+                <Typography variant="caption" color="text.secondary" display="block">{product?.category}</Typography>
+                <Typography variant="body2" fontWeight={700} color="primary" lineHeight={1}>BDT {((product?.price || 0) * qty).toLocaleString()}</Typography>
               </Stack>
-              </>)}
+              <ButtonGroup orientation="vertical" size="small" variant="outlined" sx={{ flexShrink: 0, "& .MuiButtonGroup-grouped": { borderRadius: 0 }, "& .MuiButton-root.Mui-disabled": { borderColor: "primary.main", color: "primary.main" } }}>
+                <Button onClick={() => onSetQty(pid, qty + 1)} sx={{ px: 0.75, minWidth: 30 }}>
+                  <AddIcon sx={{ fontSize: 14 }}/>
+                </Button>
+                <Button disabled sx={{ px: 1, minWidth: 32, fontWeight: 700, lineHeight: 1 }}>
+                  {qty}
+                </Button>
+                <Button onClick={() => onSetQty(pid, qty - 1)} sx={{ px: 0.75, minWidth: 30 }}>
+                  { qty > 1 ? <RemoveIcon sx={{ fontSize: 14 }}/> : <RemoveShoppingCartIcon sx={{ fontSize: 14 }}/> }
+                </Button>
+              </ButtonGroup>
+            </Stack>
+            )}
           </Box>
         </Box>
       </Box>
@@ -159,16 +158,15 @@ export default function Cart() {
   )
   
   return (
-    <Box sx={{ pb: 4 }}>
-      <Stack spacing={1} sx={{ p: 2.5 }}>
+    <Stack sx={{ height: "100%" }}>
+      <Stack spacing={2.5} sx={{ flex: 1, p: 2.5 }}>
         {sortedList.map(({ pid, qty }) => ( <SwipeableCartItem key={pid} pid={pid} qty={qty} product={products[pid]} loading={loading} onRemove={removeFromCart} onNavigate={(pid) => navigate(`/view/${pid}`)} onSetQty={setQty}/> ))}
       </Stack>
-      <Divider/>
-      <Stack>
+      <Stack spacing={1} sx={{ position: "sticky", bottom: 0, p: 2.5, borderTop: 1, borderColor: "divider", bgcolor: "background.default" }}>
         <Typography color="text.secondary" variant="body2">{count} item{count !== 1 ? "s" : ""}</Typography>
         <Typography variant="h6" fontWeight={800} color="primary">BDT {total.toLocaleString()}</Typography>
-        <Button disableElevation variant="contained" size="large" startIcon={<ShoppingBasketIcon/>} sx={{ borderRadius: 0 }}>Checkout</Button>
+        <Button disableElevation variant="contained" size="large" startIcon={<ShoppingBasketIcon/>}>Checkout</Button>
       </Stack>
-    </Box>
+    </Stack>
   )
 }

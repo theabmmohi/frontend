@@ -19,6 +19,7 @@ import {
 
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom"
 import LocalShippingIcon from "@mui/icons-material/LocalShipping"
+import RecentActorsIcon from "@mui/icons-material/RecentActors"
 import NewReleasesIcon from "@mui/icons-material/NewReleases"
 import RateReviewIcon from "@mui/icons-material/RateReview"
 import VerifiedIcon from "@mui/icons-material/Verified"
@@ -95,6 +96,10 @@ export default function me() {
         <Button>
           <GridViewIcon/>
           <Typography variant="caption">Orders</Typography>
+        </Button>
+        <Button>
+          <RecentActorsIcon/>
+          <Typography variant="caption">Addresses</Typography>
         </Button>
       </ButtonGroup>
       <ButtonGroup fullWidth>
