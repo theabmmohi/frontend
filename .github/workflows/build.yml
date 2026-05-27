@@ -8,55 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: Bump version
-        id: version
-        run: |
-          FILE=android/app/build.gradle
-
-          OLD=$(grep versionName $FILE | grep -o '".*"' | tr -d '"')
-          IFS='.' read -r major minor patch <<< "$OLD"
-          patch=$((patch + 1))
-          if [ $patch -gt 9 ]; then patch=0; minor=$((minor + 1)); fi
-          if [ $minor -gt 9 ]; then minor=0; major=$((major + 1)); fi
-          NEW="$major.$minor.$patch"
-
-          sed -i "s/versionName \"$OLD\"/versionName \"$NEW\"/" $FILE
-          OLD_CODE=$(grep versionCode $FILE | grep -o '[0-9]*')
-          sed -i "s/versionCode $OLD_CODE/versionCode $((OLD_CODE + 1))/" $FILE
-
-          echo "version=$NEW" >> $GITHUB_OUTPUT
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Sync Capacitor
-        run: npm run build && npx cap sync android
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-
+      - name: Get Version from Gradle
+        id: version
+        run: |
+          VERSION_NAME=$(grep "versionName" android/app/build.gradle | awk '{print $2}' | tr -d '"')
+          echo "version=$VERSION_NAME" >> $GITHUB_OUTPUT
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-
       - name: Rename APK
         id: apk
         run: |
@@ -66,14 +35,12 @@ jobs:
           APK_NAME="${VERSION}U-${SLUG}.apk"
           cp android/app/build/outputs/apk/debug/app-debug.apk "${APK_NAME}"
           echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
-
-      - name: Delete previous release
+      - name: Delete Previous GitHub Release
         run: |
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub Release
+      - name: Create New GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
@@ -81,14 +48,3 @@ jobs:
           body: "v${{ steps.version.outputs.version }} — ${{ steps.apk.outputs.apk_name }}"
           files: ${{ steps.apk.outputs.apk_name }}
           make_latest: true
-
-      - name: Commit version bump
-        run: |
-          git config user.email "ci@github.com"
-          git config user.name "GitHub Actions"
-          git stash
-          git pull --rebase
-          git stash pop 2>/dev/null || true
-          git add android/app/build.gradle
-          git commit -m "v${{ steps.version.outputs.version }}"
-          git push
